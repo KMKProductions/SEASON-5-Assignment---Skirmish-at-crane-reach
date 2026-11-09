@@ -1,0 +1,19 @@
+# Top-level dependency intents for template-v1 — the source of truth for the dependency set.
+# This is the single global dependency set, shared by every environment template layer (the
+# union of what all environments need); there is one set per template-v<N> version.
+#
+# Rule: edit this file, then recompile requirements.txt with
+#   uv pip compile templates/base/requirements.in -o templates/base/requirements.txt \
+#     --python-version 3.12
+# Never hand-edit requirements.txt. The compiled file is the fully pinned transitive closure
+# that manifests reference (template_version 1) and the Stage 3 base image installs.
+
+pettingzoo
+gymnasium
+numpy
+pymunk==7.3.0
+jsonschema
+websockets>=16,<17
+python-dotenv
+openai
+wcwidth==0.2.13

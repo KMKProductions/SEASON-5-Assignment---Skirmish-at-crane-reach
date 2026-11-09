@@ -1,0 +1,2 @@
+# Dependencies for running the template's tests. Inherited by every composed example.
+pytest==8.3.4

@@ -1,0 +1,5 @@
+{
+  "entry_point": "agent",
+  "class_name": "Agent",
+  "template_version": 1
+}

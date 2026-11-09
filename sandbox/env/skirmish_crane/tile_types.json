@@ -1,0 +1,36 @@
+{
+  "terrains": {
+    "grass": { "passable": true, "move_cost": 1 },
+    "hill": { "passable": true, "move_cost": 2 },
+    "water": { "passable": false, "move_cost": 0 },
+    "void": { "passable": false, "move_cost": 0 }
+  },
+  "features": {
+    "none": { "move_cost_delta": 0, "entry_damage": 0 },
+    "forest": { "move_cost_delta": 1, "entry_damage": 0 },
+    "marsh": { "move_cost_delta": 2, "entry_damage": 0 },
+    "waste": { "move_cost_delta": 0, "entry_damage": 2 }
+  },
+  "scatter": {
+    "terrain": {
+      "die": 20,
+      "default": "grass",
+      "rolls": [{ "roll": 0, "value": "hill", "requires_parameter": null }]
+    },
+    "feature": {
+      "die": 20,
+      "default": "none",
+      "rolls": [
+        { "roll": 0, "value": "forest", "requires_parameter": null },
+        { "roll": 1, "value": "marsh", "requires_parameter": null },
+        { "roll": 2, "value": "waste", "requires_parameter": "wasteland" }
+      ]
+    }
+  },
+  "tile_codes": {
+    "grass": { "none": "g", "forest": "f", "marsh": "m", "waste": "s" },
+    "hill": { "none": "h", "forest": "F", "marsh": "M", "waste": "S" },
+    "water": { "none": "w" },
+    "void": { "none": "v" }
+  }
+}

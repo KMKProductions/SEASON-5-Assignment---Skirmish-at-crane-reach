@@ -1,0 +1,208 @@
+{
+  "$id": "https://vox-deorum.github.io/game-sandbox/schema/recording-header.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": {},
+  "description": "Line 1 of every recording and the first frame of the Stage 3 live stream. Position, not a type field, distinguishes it from state lines.",
+  "properties": {
+    "created_at": {
+      "description": "When the recording was created.",
+      "format": "date-time",
+      "type": "string"
+    },
+    "environment": {
+      "description": "Name of the environment that produced this recording.",
+      "type": "string"
+    },
+    "overlay_static": {
+      "additionalProperties": {},
+      "description": "Environment-specific immutable rendering data captured once after reset. Omitted when the environment has none.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "parameters": {
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        ]
+      },
+      "description": "Complete resolved environment parameter map used by this episode.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "players": {
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "human",
+                "type": "string"
+              },
+              "label": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "user": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "label"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "agent",
+                "type": "string"
+              },
+              "label": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "submission_id": {
+                "description": "The submission whose code ran this player.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "user": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "label",
+              "submission_id"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "builtin_name": {
+                "description": "Stable name of the built-in agent whose code ran this player.",
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "type": "string"
+              },
+              "kind": {
+                "const": "agent",
+                "type": "string"
+              },
+              "label": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "label",
+              "builtin_name"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "description": "Per-player attribution: who or what drove each PettingZoo player this episode, keyed by player id (as in a step state's agents map).",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^player_[0-9]+$",
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "schema_version": {
+      "const": 1,
+      "description": "Integer schema version. Authoritative for the recording or stream; every state line must match it. Version 1 requires the player attribution, seat partition, and materialized seat plan because pre-release recordings are recreated rather than supported.",
+      "type": "number"
+    },
+    "seat_plan": {
+      "description": "Canonical key of the resolved seat plan, or solo for a player-bounds environment.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "seats": {
+      "additionalProperties": {
+        "items": {
+          "pattern": "^player_[0-9]+$",
+          "type": "string"
+        },
+        "minItems": 1,
+        "prefixItems": [
+          {
+            "pattern": "^player_[0-9]+$",
+            "type": "string"
+          }
+        ],
+        "type": "array",
+        "uniqueItems": true
+      },
+      "description": "The resolved seat-to-player map, keyed by seat id. Together with players this is an exact player partition.",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^seat_[0-9]+$",
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "seed": {
+      "description": "Episode seed. Optional now; filled in by Stage 2.",
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "sidecars": {
+      "description": "Auxiliary files stored alongside the recording. A reader that does not recognize a name must skip that entry and load the recording normally.",
+      "items": {
+        "additionalProperties": {},
+        "properties": {
+          "name": {
+            "description": "Identifies the sidecar's kind against the registry of known names (empty in Stage 1).",
+            "type": "string"
+          },
+          "path": {
+            "description": "Path relative to the recording's own directory.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "path"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "environment",
+    "parameters",
+    "players",
+    "seats",
+    "seat_plan"
+  ],
+  "title": "RecordingHeader",
+  "type": "object"
+}

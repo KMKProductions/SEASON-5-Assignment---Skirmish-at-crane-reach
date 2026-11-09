@@ -1,0 +1,197 @@
+{
+  "$defs": {
+    "agent_step": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "description": "Action this agent took on this tick. Shape is environment-specific."
+        },
+        "observation": {
+          "description": "Display observation for this agent. Shape is environment-specific; the renderer is its only consumer."
+        },
+        "reward": {
+          "description": "Reward for this agent on this tick.",
+          "type": "number"
+        },
+        "score": {
+          "description": "Cumulative score for this agent through this tick.",
+          "type": "number"
+        },
+        "timing": {
+          "additionalProperties": false,
+          "properties": {
+            "chat_ms": {
+              "description": "Chargeable optional-chat time for this tick. Present only when the chat hook runs and kept separate so consumers can show act time alone.",
+              "minimum": 0,
+              "type": "number"
+            },
+            "decision_ms": {
+              "description": "Chargeable act time for this tick. The leaderboard compute column combines it with optional-hook timing.",
+              "minimum": 0,
+              "type": "number"
+            },
+            "learn_ms": {
+              "description": "Chargeable optional-learn time for this tick. Present only for learning agents and kept separate so consumers can show act time alone.",
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "reward",
+        "score"
+      ],
+      "type": "object"
+    },
+    "chat_options": {
+      "additionalProperties": false,
+      "description": "The current external player's allowed direct recipients and default recipient. Absent when no external messaging turn is open.",
+      "properties": {
+        "default_recipient": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The selected direct recipient, or null when broadcast is the default."
+        },
+        "sender": {
+          "description": "Player id of the external actor allowed to send on this state.",
+          "type": "string"
+        },
+        "target_recipients": {
+          "description": "Ordered direct-message recipients. Broadcast is always available separately.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "sender",
+        "target_recipients",
+        "default_recipient"
+      ],
+      "type": "object"
+    },
+    "message": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "description": "Player id of the sender.",
+          "type": "string"
+        },
+        "recipients": {
+          "description": "Live-stream-only delivered audience of a broadcast the environment bounded. The backend uses it to filter a controller view and strips it before any browser; a recording never contains it.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "text": {
+          "type": "string"
+        },
+        "to": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Player id of the recipient, or null for a broadcast."
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "text"
+      ],
+      "type": "object"
+    },
+    "step_timing": {
+      "additionalProperties": false,
+      "properties": {
+        "duration_ms": {
+          "description": "Wall-clock duration of the whole step.",
+          "minimum": 0,
+          "type": "number"
+        },
+        "started_at": {
+          "description": "epoch milliseconds UTC",
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "started_at",
+        "duration_ms"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://vox-deorum.github.io/game-sandbox/schema/step-state.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One per-step state object: the canonical wire format between the environment and the renderer, and the per-line payload stored in a recording.",
+  "properties": {
+    "agents": {
+      "additionalProperties": {
+        "$ref": "#/$defs/agent_step"
+      },
+      "description": "Per-agent step data keyed by player id (the PettingZoo agent id).",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "chat_options": {
+      "$ref": "#/$defs/chat_options"
+    },
+    "messages": {
+      "description": "Messages sent on this tick. Absent when empty to keep lines small. Lit up in Stage 8.",
+      "items": {
+        "$ref": "#/$defs/message"
+      },
+      "type": "array"
+    },
+    "overlay": {
+      "additionalProperties": {},
+      "description": "Open extension region for environment-specific payloads (for example Flappy Bird pipe positions). The only object with additionalProperties allowed.",
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "schema_version": {
+      "const": 1,
+      "description": "Integer schema version. Bumps only on breaking changes; equal to the recording header's schema_version.",
+      "type": "number"
+    },
+    "tick": {
+      "description": "Monotonic step counter for the episode, starting at 0.",
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "timing": {
+      "$ref": "#/$defs/step_timing"
+    }
+  },
+  "required": [
+    "schema_version",
+    "tick",
+    "agents",
+    "timing"
+  ],
+  "title": "StepState",
+  "type": "object"
+}

@@ -1,0 +1,12 @@
+DESIGN GOAL
+
+I wanted my army to play for the three objectives. I designed my units to attack, contest, and control the objectives.
+
+SHORT REFLECTION
+
+I used techniques like behavioral blocks to assign each unit its role. I also implemented the chat function so units can communicate with each other and respond according to their role.
+I tried imitation and machine learning. It took several hours but I didn't use it to its full extent to the point where I saw noticeable results.
+
+AI DISCLOSURE
+
+I used Claude Code in my work. It helped modify my code. I checked its work by running the agent and seeing the desired results. Through multiple tests, it helped me fine-tune my agent.
